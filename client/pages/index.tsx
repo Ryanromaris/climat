@@ -10,16 +10,29 @@ import {
   OrderedList,
   ListItem,
   Link,
-  Card,
-  CardHeader,
-  CardBody,
-  StackDivider,
-  Stack,
-  Text,
 } from '@chakra-ui/react';
-import { relative } from 'path';
+import axios from 'axios';
+
+import { useQuery } from 'react-query';
 
 const Home = () => {
+  const { isLoading, isError, isSuccess, data, error } = useQuery(
+    'categories',
+    () =>
+      axios({
+        method: 'get',
+        url: 'http://localhost:8080/category',
+        responseType: 'json',
+      })
+  );
+
+  if (isLoading) {
+    return <div>Loading</div>;
+  }
+  if (isError) {
+    return <div>Error !!</div>;
+  }
+
   return (
     <>
       <Flex
@@ -31,68 +44,30 @@ const Home = () => {
       >
         <Heading>Hello Climat</Heading>
       </Flex>
-      <Accordion allowToggle>
-        <AccordionItem>
-          <h2>
-            <AccordionButton>
-              <Box as='span' flex='1' textAlign='left'>
-                미국
-              </Box>
-              <AccordionIcon />
-            </AccordionButton>
-          </h2>
-          <AccordionPanel pb={4}>
-            <OrderedList>
-              <ListItem>
-                <Link href='/menu/1'>links can live inline with text</Link>
-              </ListItem>
-              <ListItem>Consectetur adipiscing elit</ListItem>
-              <ListItem>Integer molestie lorem at massa</ListItem>
-              <ListItem>Facilisis in pretium nisl aliquet</ListItem>
-            </OrderedList>
-          </AccordionPanel>
-        </AccordionItem>
 
-        <AccordionItem>
-          <h2>
-            <AccordionButton>
-              <Box as='span' flex='1' textAlign='left'>
-                스페인
-              </Box>
-              <AccordionIcon />
-            </AccordionButton>
-          </h2>
-          <AccordionPanel pb={4}>
-            <OrderedList>
-              <ListItem>
-                <Link href='/menu/1'>links can live inline with text</Link>
-              </ListItem>
-              <ListItem>Consectetur adipiscing elit</ListItem>
-              <ListItem>Integer molestie lorem at massa</ListItem>
-              <ListItem>Facilisis in pretium nisl aliquet</ListItem>
-            </OrderedList>
-          </AccordionPanel>
-        </AccordionItem>
-        <AccordionItem>
-          <h2>
-            <AccordionButton>
-              <Box as='span' flex='1' textAlign='left'>
-                프랑스
-              </Box>
-              <AccordionIcon />
-            </AccordionButton>
-          </h2>
-          <AccordionPanel pb={4}>
-            <OrderedList>
-              <ListItem>
-                <Link href='/menu/1'>links can live inline with text</Link>
-              </ListItem>
-              <ListItem>Consectetur adipiscing elit</ListItem>
-              <ListItem>Integer molestie lorem at massa</ListItem>
-              <ListItem>Facilisis in pretium nisl aliquet</ListItem>
-            </OrderedList>
-          </AccordionPanel>
-        </AccordionItem>
+      <Accordion allowToggle>
+        {data?.data.map((category: string, idx: number) => (
+          <AccordionItem key={idx}>
+            <h2>
+              <AccordionButton>
+                <Box as='span' flex='1' textAlign='left'>
+                  {category}
+                </Box>
+                <AccordionIcon />
+              </AccordionButton>
+            </h2>
+            <AccordionPanel pb={4}>
+              <OrderedList>
+                <ListItem>
+                  <Link href='/menu/1'>links can live inline with text</Link>
+                </ListItem>
+                <ListItem>Consectetur adipiscing elit</ListItem>
+                <ListItem>Integer molestie lorem at massa</ListItem>
+                <ListItem>Facilisis in pretium nisl aliquet</ListItem>
+              </OrderedList>
+            </AccordionPanel>
+          </AccordionItem>
+        ))}
       </Accordion>
     </>
   );
