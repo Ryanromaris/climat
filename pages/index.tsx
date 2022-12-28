@@ -10,6 +10,12 @@ import {
   OrderedList,
   ListItem,
   Link,
+  Card,
+  CardHeader,
+  CardBody,
+  StackDivider,
+  Stack,
+  Text,
 } from '@chakra-ui/react';
 import { relative } from 'path';
 
