@@ -7,15 +7,17 @@ import {
   AccordionIcon,
   AccordionPanel,
   Box,
-  OrderedList,
-  ListItem,
-  Link,
 } from '@chakra-ui/react';
 import axios from 'axios';
+import { useRouter } from 'next/router';
+import { useState } from 'react';
 
 import { useQuery } from 'react-query';
+import CategoryItems from '../components/CategoryItems';
 
 const Home = () => {
+  const router = useRouter();
+  const [category, setCategory] = useState<string>('');
   const { isLoading, isError, isSuccess, data, error } = useQuery(
     'categories',
     () =>
@@ -25,11 +27,18 @@ const Home = () => {
         responseType: 'json',
       })
   );
+  const menus = useQuery('menus', () =>
+    axios({
+      method: 'get',
+      url: 'http://localhost:8080/menu',
+      responseType: 'json',
+    })
+  );
 
-  if (isLoading) {
+  if (isLoading || menus.isLoading) {
     return <div>Loading</div>;
   }
-  if (isError) {
+  if (isError || menus.isError) {
     return <div>Error !!</div>;
   }
 
@@ -45,11 +54,16 @@ const Home = () => {
         <Heading>Hello Climat</Heading>
       </Flex>
 
-      <Accordion allowToggle>
+      <Accordion index={Number(router.query.index)} allowToggle>
         {data?.data.map((category: string, idx: number) => (
           <AccordionItem key={idx}>
             <h2>
-              <AccordionButton>
+              <AccordionButton
+                onClick={() => {
+                  router.push(`?index=${idx}`);
+                  setCategory(category);
+                }}
+              >
                 <Box as='span' flex='1' textAlign='left'>
                   {category}
                 </Box>
@@ -57,14 +71,9 @@ const Home = () => {
               </AccordionButton>
             </h2>
             <AccordionPanel pb={4}>
-              <OrderedList>
-                <ListItem>
-                  <Link href='/menu/1'>links can live inline with text</Link>
-                </ListItem>
-                <ListItem>Consectetur adipiscing elit</ListItem>
-                <ListItem>Integer molestie lorem at massa</ListItem>
-                <ListItem>Facilisis in pretium nisl aliquet</ListItem>
-              </OrderedList>
+              {menus?.data?.data && (
+                <CategoryItems category={category} menus={menus.data.data} />
+              )}
             </AccordionPanel>
           </AccordionItem>
         ))}
