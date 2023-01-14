@@ -14,72 +14,65 @@ import { useState } from 'react';
 
 import { useQuery } from 'react-query';
 import CategoryItems from '../components/CategoryItems';
+import { CategoryList, MenuType } from '../types/type';
 
 const Home = () => {
   const router = useRouter();
-  const [category, setCategory] = useState<string>('');
-  const { isLoading, isError, isSuccess, data, error } = useQuery(
-    'categories',
-    () =>
-      axios({
-        method: 'get',
-        url: 'http://localhost:8080/category',
-        responseType: 'json',
-      })
-  );
-  const menus = useQuery('menus', () =>
-    axios({
-      method: 'get',
-      url: 'http://localhost:8080/menu',
-      responseType: 'json',
-    })
+
+  const categoryQuery = useQuery('categories', () =>
+    axios.get<CategoryList>('http://localhost:8080/category')
   );
 
-  if (isLoading || menus.isLoading) {
+  const menus = useQuery('menus', () =>
+    axios.get<MenuType[]>('http://localhost:8080/menu')
+  );
+
+  if (categoryQuery.isLoading || menus.isLoading) {
     return <div>Loading</div>;
   }
-  if (isError || menus.isError) {
+  if (categoryQuery.isError || menus.isError) {
     return <div>Error !!</div>;
   }
 
-  return (
-    <>
-      <Flex
-        height={'100%'}
-        alignItems={'center'}
-        justifyContent={'center'}
-        direction={'column'}
-        p={4}
-      >
-        <Heading>Hello Climat</Heading>
-      </Flex>
+  if (categoryQuery.isSuccess) {
+    return (
+      <>
+        <Flex
+          height={'100%'}
+          alignItems={'center'}
+          justifyContent={'center'}
+          direction={'column'}
+          p={4}
+        >
+          <Heading>Hello Climat</Heading>
+        </Flex>
 
-      <Accordion index={Number(router.query.index)} allowToggle>
-        {data?.data.map((category: string, idx: number) => (
-          <AccordionItem key={idx}>
-            <h2>
-              <AccordionButton
-                onClick={() => {
-                  router.push(`?index=${idx}`);
-                  setCategory(category);
-                }}
-              >
-                <Box as='span' flex='1' textAlign='left'>
-                  {category}
-                </Box>
-                <AccordionIcon />
-              </AccordionButton>
-            </h2>
-            <AccordionPanel pb={4}>
-              {menus?.data?.data && (
-                <CategoryItems category={category} menus={menus.data.data} />
-              )}
-            </AccordionPanel>
-          </AccordionItem>
-        ))}
-      </Accordion>
-    </>
-  );
+        <Accordion index={Number(router.query.index)} allowToggle>
+          {categoryQuery.data.data.map((category: string, idx: number) => (
+            <AccordionItem key={idx}>
+              <h2>
+                <AccordionButton
+                  onClick={() => {
+                    router.push(`?index=${idx}`);
+                  }}
+                >
+                  <Box as='span' flex='1' textAlign='left'>
+                    {category}
+                  </Box>
+                  <AccordionIcon />
+                </AccordionButton>
+              </h2>
+              <AccordionPanel pb={4}>
+                {menus?.data?.data && (
+                  <CategoryItems category={category} menus={menus.data.data} />
+                )}
+              </AccordionPanel>
+            </AccordionItem>
+          ))}
+        </Accordion>
+      </>
+    );
+  }
 };
 
 export default Home;

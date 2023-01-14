@@ -2,10 +2,10 @@ import { Link, ListItem, OrderedList } from '@chakra-ui/react';
 import axios from 'axios';
 import { useRouter } from 'next/router';
 import { useQuery } from 'react-query';
-import { Menu } from '../pages/menu/[id]';
+import { MenuType } from '../types/type';
 
 type Props = {
-  menus: Menu[];
+  menus: MenuType[];
   category: string;
 };
 

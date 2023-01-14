@@ -14,16 +14,7 @@ import {
 import axios from 'axios';
 import { useRouter } from 'next/router';
 import { useQuery } from 'react-query';
-
-export type WineType = 'red' | 'white' | 'sparkling' | 'rose';
-
-export type Menu = {
-  id: number;
-  name: string;
-  category: string;
-  type: WineType;
-  summary: string;
-};
+import { MenuType } from '../../types/type';
 
 const MenuDetail = () => {
   const router = useRouter();
@@ -32,11 +23,7 @@ const MenuDetail = () => {
   const { isLoading, isError, isSuccess, data, error } = useQuery(
     'menus',
     () => {
-      return axios<Menu>({
-        method: 'get',
-        url: `http://localhost:8080/menu/${id}`,
-        responseType: 'json',
-      });
+      return axios.get<MenuType>(`http://localhost:8080/menu/${id}`);
     },
     { enabled: !!id }
   );
