@@ -1,16 +1,10 @@
 import express from 'express';
+import * as categoryController from '../controller/category.js';
 
 const router = express.Router();
 
-const categories = ['미국', '프랑스', '칠레'];
+router.get('/', categoryController.getCategories);
 
-const menu =
-  //Get
-  router.get('/', (req, res, next) => {
-    res.status(200).json(categories);
-  });
-//post
-
-//Delete
+router.post('/', categoryController.createCategory);
 
 export default router;

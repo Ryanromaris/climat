@@ -1,11 +1,17 @@
-export type CategoryList = string[];
+export type CategoryType = {
+  id: number;
+  name: string;
+};
 
 export type WineType = 'red' | 'white' | 'sparkling' | 'rose';
 
 export type MenuType = {
   id: number;
   name: string;
-  category: string;
+  categoryname: string;
   type: WineType;
   summary: string;
+  alcohol: string;
+  vintage: string;
+  amount: string;
 };

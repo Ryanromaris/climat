@@ -14,13 +14,13 @@ import { useState } from 'react';
 
 import { useQuery } from 'react-query';
 import CategoryItems from '../components/CategoryItems';
-import { CategoryList, MenuType } from '../types/type';
+import { CategoryType, MenuType } from '../types/type';
 
 const Home = () => {
   const router = useRouter();
 
   const categoryQuery = useQuery('categories', () =>
-    axios.get<CategoryList>('http://localhost:8080/category')
+    axios.get<CategoryType[]>('http://localhost:8080/category')
   );
 
   const menus = useQuery('menus', () =>
@@ -48,7 +48,7 @@ const Home = () => {
         </Flex>
 
         <Accordion index={Number(router.query.index)} allowToggle>
-          {categoryQuery.data.data.map((category: string, idx: number) => (
+          {categoryQuery.data.data.map((category, idx: number) => (
             <AccordionItem key={idx}>
               <h2>
                 <AccordionButton
@@ -57,14 +57,17 @@ const Home = () => {
                   }}
                 >
                   <Box as='span' flex='1' textAlign='left'>
-                    {category}
+                    {category.name}
                   </Box>
                   <AccordionIcon />
                 </AccordionButton>
               </h2>
               <AccordionPanel pb={4}>
                 {menus?.data?.data && (
-                  <CategoryItems category={category} menus={menus.data.data} />
+                  <CategoryItems
+                    category={category.name}
+                    menus={menus.data.data}
+                  />
                 )}
               </AccordionPanel>
             </AccordionItem>

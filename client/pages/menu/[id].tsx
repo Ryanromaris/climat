@@ -40,7 +40,7 @@ const MenuDetail = () => {
       <Card>
         <CardHeader>
           <Heading size='md'>
-            {data?.data.category} - {data?.data.name} 메뉴 상세페이지 {id}
+            {data?.data.categoryname} - {data?.data.name}
           </Heading>
         </CardHeader>
 
@@ -69,6 +69,30 @@ const MenuDetail = () => {
               </Heading>
               <Text pt='2' fontSize='sm'>
                 {data?.data.summary}
+              </Text>
+            </Box>
+            <Box>
+              <Heading size='xs' textTransform='uppercase'>
+                Vintage
+              </Heading>
+              <Text pt='2' fontSize='sm'>
+                {data?.data.vintage}
+              </Text>
+            </Box>
+            <Box>
+              <Heading size='xs' textTransform='uppercase'>
+                Amount
+              </Heading>
+              <Text pt='2' fontSize='sm'>
+                {data?.data.amount}
+              </Text>
+            </Box>
+            <Box>
+              <Heading size='xs' textTransform='uppercase'>
+                Alcohol
+              </Heading>
+              <Text pt='2' fontSize='sm'>
+                {data?.data.alcohol}
               </Text>
             </Box>
           </Stack>

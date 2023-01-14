@@ -2,8 +2,6 @@ import {
   Box,
   Button,
   Card,
-  CardBody,
-  CardHeader,
   Center,
   Flex,
   Heading,
@@ -21,12 +19,13 @@ import {
   Stack,
   StackDivider,
   useDisclosure,
+  useToast,
 } from '@chakra-ui/react';
 import axios from 'axios';
 import { useRef, useState } from 'react';
-import { useQuery } from 'react-query';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
 
-import { CategoryList } from '../types/type';
+import { CategoryType } from '../types/type';
 
 // const MODAL_TYPE = ['category','menu']
 
@@ -38,9 +37,44 @@ const Admin = () => {
 
   const [modal, setModal] = useState('');
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const categoryNameRef = useRef<any>('');
+  const toast = useToast();
 
   const categories = useQuery('categories', () =>
-    axios.get<CategoryList>('http://localhost:8080/category')
+    axios.get<CategoryType[]>('http://localhost:8080/category')
+  );
+
+  const queryClient = useQueryClient();
+  const { mutate } = useMutation(
+    'categories',
+    () =>
+      axios.post('http://localhost:8080/category', {
+        name: categoryNameRef.current.value,
+      }),
+    {
+      onSuccess: (res) => {
+        const newData = res.data[res.data.length - 1].name;
+        toast({
+          title: '카테고리 생성 완료',
+          description: `'${newData}' 카테고리 생성이 완료되었습니다.`,
+          status: 'success',
+          duration: 5000,
+          isClosable: true,
+          position: 'top',
+        });
+        return queryClient.invalidateQueries('categories');
+      },
+      onError: (err: any) => {
+        toast({
+          title: '카테고리 추가 실패',
+          description: `${err.response.data.message}`,
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+          position: 'top',
+        });
+      },
+    }
   );
 
   if (!auth) {
@@ -128,15 +162,20 @@ const Admin = () => {
           <ModalContent>
             <ModalHeader>카테고리 추가</ModalHeader>
             <ModalCloseButton />
+            {categories.data.data.map((category) => (
+              <Card>{category.name}</Card>
+            ))}
             <ModalBody>
-              <Input placeholder='카테고리 입력하세용' />
+              <Input placeholder='카테고리 입력하세용' ref={categoryNameRef} />
             </ModalBody>
 
             <ModalFooter>
               <Button colorScheme='blue' mr={3} onClick={onClose}>
                 Close
               </Button>
-              <Button variant='ghost'>추가하기</Button>
+              <Button variant='ghost' onClick={() => mutate()}>
+                추가하기
+              </Button>
             </ModalFooter>
           </ModalContent>
         </Modal>
@@ -160,7 +199,7 @@ const Admin = () => {
                   </Heading>
                   <Select placeholder='Select option'>
                     {categories.data.data?.map((category) => (
-                      <option value={category}>{category}</option>
+                      <option value={category.name}>{category.name}</option>
                     ))}
                   </Select>
                 </Box>

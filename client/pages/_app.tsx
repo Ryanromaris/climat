@@ -4,7 +4,14 @@ import { QueryClient, QueryClientProvider } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
 
 export default function App({ Component, pageProps }: AppProps) {
-  const queryClient = new QueryClient();
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        staleTime: 0,
+        retry: false,
+      },
+    },
+  });
   return (
     <ChakraProvider>
       <QueryClientProvider client={queryClient}>
