@@ -2,6 +2,8 @@ import express from 'express';
 import cors from 'cors';
 import categoryRouter from './router/category.js';
 import menuRouter from './router/menu.js';
+import { db } from './db/database.js';
+// import { initSocket } from './connection/socket.js';
 
 const app = express();
 
@@ -18,4 +20,8 @@ app.use((error, req, res, next) => {
   res.sendStatus(500);
 });
 
+db.getConnection().then((connection) => console.log(connection));
 app.listen(8080);
+// const server =
+
+// initSocket(server);
