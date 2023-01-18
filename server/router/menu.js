@@ -7,4 +7,6 @@ router.get('/', menuController.getMenus);
 
 router.get('/:id', menuController.getMenuById);
 
+router.post('/', menuController.createMenu);
+
 export default router;

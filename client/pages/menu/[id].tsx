@@ -67,9 +67,15 @@ const MenuDetail = () => {
               <Heading size='xs' textTransform='uppercase'>
                 Summary
               </Heading>
-              <Text pt='2' fontSize='sm'>
-                {data?.data.summary}
-              </Text>
+              {data?.data.summary && (
+                <Text
+                  pt='2'
+                  fontSize='sm'
+                  dangerouslySetInnerHTML={{
+                    __html: data.data.summary.replaceAll('\n', '<br/>'),
+                  }}
+                ></Text>
+              )}
             </Box>
             <Box>
               <Heading size='xs' textTransform='uppercase'>

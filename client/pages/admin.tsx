@@ -20,23 +20,38 @@ import {
   StackDivider,
   useDisclosure,
   useToast,
+  Text,
+  CardBody,
+  Spacer,
+  Textarea,
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogOverlay,
 } from '@chakra-ui/react';
+
 import axios from 'axios';
-import { useRef, useState } from 'react';
+import { useContext, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
+import DialogProvider, { DialogContext } from '../context/DialogProvider';
 
 import { CategoryType } from '../types/type';
 
 // const MODAL_TYPE = ['category','menu']
 
 const Admin = () => {
+  const { openSimpleDialog } = useContext(DialogContext);
   const [auth, setAuth] = useState(false);
   const [show, setShow] = useState(false);
   const handleClick = () => setShow(!show);
   const passwordRef = useRef<any>();
 
   const [modal, setModal] = useState('');
+
   const { isOpen, onOpen, onClose } = useDisclosure();
+
   const categoryNameRef = useRef<any>('');
   const toast = useToast();
 
@@ -45,7 +60,7 @@ const Admin = () => {
   );
 
   const queryClient = useQueryClient();
-  const { mutate } = useMutation(
+  const { mutate: createCategory } = useMutation(
     'categories',
     () =>
       axios.post('http://localhost:8080/category', {
@@ -67,6 +82,83 @@ const Admin = () => {
       onError: (err: any) => {
         toast({
           title: '카테고리 추가 실패',
+          description: `${err.response.data.message}`,
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+          position: 'top',
+        });
+      },
+    }
+  );
+
+  const { mutate: removeCategory } = useMutation(
+    'categories',
+    (id) =>
+      axios.delete(`http://localhost:8080/category/${id}`, {
+        data: { userKey: '1234' },
+      }),
+    {
+      onSuccess: (res) => {
+        toast({
+          title: '카테고리 삭제 완료',
+          description: `카테고리 삭-제.`,
+          status: 'success',
+          duration: 5000,
+          isClosable: true,
+          position: 'top',
+        });
+        return queryClient.invalidateQueries('categories');
+      },
+      onError: (err: any) => {
+        toast({
+          title: '카테고리 삭제 실패',
+          description: `${err.response.data.message}`,
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+          position: 'top',
+        });
+      },
+    }
+  );
+
+  const menuNameRef = useRef<any>('');
+  const menuCategoryNameRef = useRef<any>('');
+  const menuTypeRef = useRef<any>('');
+  const menuSummaryRef = useRef<any>('');
+  const menuAlcoholRef = useRef<any>('');
+  const menuAmountRef = useRef<any>('');
+  const menuVintageRef = useRef<any>('');
+
+  const { mutate: createMenu } = useMutation(
+    'menu',
+    () =>
+      axios.post('http://localhost:8080/menu', {
+        name: menuNameRef.current.value,
+        categoryname: menuCategoryNameRef.current.value,
+        type: menuTypeRef.current.value,
+        summary: menuSummaryRef.current.value,
+        alcohol: menuAlcoholRef.current.value,
+        amount: menuAmountRef.current.value,
+        vintage: menuVintageRef.current.value,
+      }),
+    {
+      onSuccess: (res) => {
+        const newData = res.data[res.data.length - 1].name;
+        toast({
+          title: '메뉴 생성 완료',
+          description: `'${newData}' 메뉴 생성이 완료되었습니다.`,
+          status: 'success',
+          duration: 5000,
+          isClosable: true,
+          position: 'top',
+        });
+        return queryClient.invalidateQueries('categories');
+      },
+      onError: (err: any) => {
+        toast({
+          title: '메뉴 추가 실패',
           description: `${err.response.data.message}`,
           status: 'error',
           duration: 5000,
@@ -163,9 +255,29 @@ const Admin = () => {
             <ModalHeader>카테고리 추가</ModalHeader>
             <ModalCloseButton />
             {categories.data.data.map((category) => (
-              <Card>{category.name}</Card>
+              <>
+                <Card>
+                  <Flex alignItems='center' pr='5'>
+                    <Text p='4'>{category.name}</Text>
+                    <Spacer />
+                    <Button
+                      p='4'
+                      onClick={() => {
+                        openSimpleDialog({
+                          title: '카테고리 삭제',
+                          content: `정말로 ${category.name} 카테고리를 삭제하시겠습니까?`,
+                          handleConfirm: () => removeCategory(category.id),
+                          handleClose: () => {},
+                        });
+                      }}
+                    >
+                      삭제
+                    </Button>
+                  </Flex>
+                </Card>
+              </>
             ))}
-            <ModalBody>
+            <ModalBody m={2}>
               <Input placeholder='카테고리 입력하세용' ref={categoryNameRef} />
             </ModalBody>
 
@@ -173,7 +285,7 @@ const Admin = () => {
               <Button colorScheme='blue' mr={3} onClick={onClose}>
                 Close
               </Button>
-              <Button variant='ghost' onClick={() => mutate()}>
+              <Button variant='ghost' onClick={() => createCategory()}>
                 추가하기
               </Button>
             </ModalFooter>
@@ -197,7 +309,7 @@ const Admin = () => {
                   <Heading mb='3' size='xs' textTransform='uppercase'>
                     Category
                   </Heading>
-                  <Select placeholder='Select option'>
+                  <Select placeholder='Select option' ref={menuCategoryNameRef}>
                     {categories.data.data?.map((category) => (
                       <option value={category.name}>{category.name}</option>
                     ))}
@@ -205,33 +317,39 @@ const Admin = () => {
                 </Box>
                 <Box>
                   <Heading mb='3' size='xs' textTransform='uppercase'>
+                    Name
+                  </Heading>
+                  <Input placeholder='' ref={menuNameRef} />
+                </Box>
+                <Box>
+                  <Heading mb='3' size='xs' textTransform='uppercase'>
                     Type
                   </Heading>
-                  <Input placeholder='Red, White ...' />
+                  <Input placeholder='Red, White ...' ref={menuTypeRef} />
                 </Box>
                 <Box>
                   <Heading mb='3' size='xs' textTransform='uppercase'>
                     Summary
                   </Heading>
-                  <Input placeholder='' />
+                  <Textarea placeholder='' ref={menuSummaryRef} />
                 </Box>
                 <Box>
                   <Heading mb='3' size='xs' textTransform='uppercase'>
                     Vintage
                   </Heading>
-                  <Input placeholder='' />
+                  <Input placeholder='' ref={menuVintageRef} />
                 </Box>
                 <Box>
                   <Heading mb='3' size='xs' textTransform='uppercase'>
                     용량
                   </Heading>
-                  <Input placeholder='' />
+                  <Input placeholder='' ref={menuAmountRef} />
                 </Box>
                 <Box>
                   <Heading mb='3' size='xs' textTransform='uppercase'>
                     도수
                   </Heading>
-                  <Input placeholder='' />
+                  <Input placeholder='' ref={menuAlcoholRef} />
                 </Box>
               </Stack>
             </ModalBody>
@@ -240,7 +358,9 @@ const Admin = () => {
               <Button colorScheme='blue' mr={3} onClick={onClose}>
                 Close
               </Button>
-              <Button variant='ghost'>추가하기</Button>
+              <Button variant='ghost' onClick={() => createMenu()}>
+                추가하기
+              </Button>
             </ModalFooter>
           </ModalContent>
         </Modal>

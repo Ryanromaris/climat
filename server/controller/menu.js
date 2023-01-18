@@ -14,3 +14,20 @@ export async function getMenuById(req, res) {
     res.status(404).json({ message: `Menu id(${id}) not found` });
   }
 }
+
+export async function createMenu(req, res, next) {
+  const { name, categoryname, type, summary, alcohol, amount, vintage } =
+    req.body;
+
+  const data = await menuRepository.create(
+    name,
+    categoryname,
+    type,
+    summary,
+    alcohol,
+    amount,
+    vintage
+  );
+
+  res.status(201).json(data);
+}

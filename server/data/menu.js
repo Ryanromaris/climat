@@ -17,3 +17,21 @@ export async function getById(id) {
     )
     .then((result) => result[0][0]);
 }
+
+export async function create(
+  name,
+  categoryname,
+  type,
+  summary,
+  alcohol,
+  amount,
+  vintage
+) {
+  return db
+    .execute(
+      'INSERT INTO menu (name, categoryname, type,summary, alcohol, amount, vintage) VALUES(?, ?, ?, ?, ?, ?, ?)',
+      [name, categoryname, type, summary, alcohol, amount, vintage]
+    )
+    .then(() => getAll())
+    .catch((e) => e);
+}
