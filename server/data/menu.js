@@ -35,3 +35,10 @@ export async function create(
     .then(() => getAll())
     .catch((e) => e);
 }
+
+export async function remove(id) {
+  return db
+    .execute('DELETE FROM menu WHERE id=?', [id])
+    .then(() => getAll())
+    .catch((e) => e);
+}

@@ -53,7 +53,9 @@ const Home = () => {
               <h2>
                 <AccordionButton
                   onClick={() => {
-                    router.push(`?index=${idx}`);
+                    Number(router.query.index) === idx
+                      ? router.push('/')
+                      : router.push(`?index=${idx}`);
                   }}
                 >
                   <Box as='span' flex='1' textAlign='left'>
