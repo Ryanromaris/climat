@@ -38,7 +38,7 @@ function SimpleDialog({
   cancelButtonEnabled = false,
   closeIconButtonEnabled = false,
   layerClassname,
-  isOpen,
+  isOpen = false,
   onClose,
   cancelRef,
 }: ISimpleDialogProps) {
