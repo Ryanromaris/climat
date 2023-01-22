@@ -286,8 +286,8 @@ const Admin = () => {
             <ModalHeader>카테고리 추가</ModalHeader>
             <ModalCloseButton />
 
-            {categories.data.data.map((category) => (
-              <Accordion allowMultiple>
+            {categories.data.data.map((category, idx) => (
+              <Accordion allowMultiple key={idx}>
                 <AccordionItem>
                   <h2>
                     <AccordionButton _expanded={{ bg: '#D3D3D3' }}>
@@ -313,8 +313,8 @@ const Admin = () => {
                   </h2>
                   {menus.data?.data
                     .filter((menu) => menu.categoryname === category.name)
-                    .map((menu) => (
-                      <AccordionPanel ml={3} pb={2}>
+                    .map((menu, idx) => (
+                      <AccordionPanel key={idx} ml={3} pb={2}>
                         <Flex>
                           <Text p='2'>- {menu.name}</Text>
                           <Spacer />
@@ -373,8 +373,10 @@ const Admin = () => {
                     Category
                   </Heading>
                   <Select placeholder='Select option' ref={menuCategoryNameRef}>
-                    {categories.data.data?.map((category) => (
-                      <option value={category.name}>{category.name}</option>
+                    {categories.data.data?.map((category, idx) => (
+                      <option key={idx} value={category.name}>
+                        {category.name}
+                      </option>
                     ))}
                   </Select>
                 </Box>

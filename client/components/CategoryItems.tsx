@@ -17,8 +17,8 @@ const CategoryItems = ({ menus, category }: Props) => {
   return (
     <>
       <OrderedList>
-        {menusByCategory?.map((menu) => (
-          <ListItem>
+        {menusByCategory?.map((menu, idx) => (
+          <ListItem key={idx}>
             <Link href={`/menu/${menu.id}`}>{menu.name}</Link>
           </ListItem>
         ))}
