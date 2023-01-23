@@ -10,8 +10,6 @@ type Props = {
 };
 
 const CategoryItems = ({ menus, category }: Props) => {
-  const router = useRouter();
-
   const menusByCategory = menus.filter((m) => m.categoryname === category);
 
   return (

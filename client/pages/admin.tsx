@@ -18,7 +18,6 @@ import {
   Stack,
   StackDivider,
   useDisclosure,
-  useToast,
   Text,
   Spacer,
   Textarea,
@@ -29,12 +28,17 @@ import {
   AccordionPanel,
 } from '@chakra-ui/react';
 
-import axios from 'axios';
 import { useContext, useRef, useState } from 'react';
-import { useMutation, useQuery, useQueryClient } from 'react-query';
-import { DialogContext } from '../context/DialogProvider';
 
-import { CategoryType, MenuType } from '../types/type';
+import { DialogContext } from '../context/DialogProvider';
+import {
+  useCategoryList,
+  useCreateCategory,
+  useCreateMenu,
+  useDeleteCategory,
+  useDeleteMenu,
+  useMenuList,
+} from '../queries/query';
 
 const Admin = () => {
   const { openSimpleDialog } = useContext(DialogContext);
@@ -44,115 +48,16 @@ const Admin = () => {
   const passwordRef = useRef<any>();
 
   const [modal, setModal] = useState('');
-
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const categoryNameRef = useRef<any>('');
-  const toast = useToast();
 
-  const categories = useQuery('categories', () =>
-    axios.get<CategoryType[]>('http://localhost:8080/category')
-  );
+  const categories = useCategoryList();
+  const menus = useMenuList();
 
-  const menus = useQuery('menus', () =>
-    axios.get<MenuType[]>('http://localhost:8080/menu')
-  );
-
-  const queryClient = useQueryClient();
-  const { mutate: createCategory } = useMutation(
-    'categories',
-    () =>
-      axios.post('http://localhost:8080/category', {
-        name: categoryNameRef.current.value,
-      }),
-    {
-      onSuccess: (res) => {
-        const newData = res.data[res.data.length - 1].name;
-        toast({
-          title: '카테고리 생성 완료',
-          description: `'${newData}' 카테고리 생성이 완료되었습니다.`,
-          status: 'success',
-          duration: 5000,
-          isClosable: true,
-          position: 'top',
-        });
-        return queryClient.invalidateQueries('categories');
-      },
-      onError: (err: any) => {
-        toast({
-          title: '카테고리 추가 실패',
-          description: `${err.response.data.message}`,
-          status: 'error',
-          duration: 5000,
-          isClosable: true,
-          position: 'top',
-        });
-      },
-    }
-  );
-
-  const { mutate: removeCategory }: { mutate: (id: number) => void } =
-    useMutation(
-      'categories',
-      (id) =>
-        axios.delete(`http://localhost:8080/category/${id}`, {
-          data: { userKey: '1234' },
-        }),
-      {
-        onSuccess: (res) => {
-          toast({
-            title: '카테고리 삭제 완료',
-            description: `카테고리 삭-제.`,
-            status: 'success',
-            duration: 5000,
-            isClosable: true,
-            position: 'top',
-          });
-          return queryClient.invalidateQueries('categories');
-        },
-        onError: (err: any) => {
-          toast({
-            title: '카테고리 삭제 실패',
-            description: `${err.response.data.message}`,
-            status: 'error',
-            duration: 5000,
-            isClosable: true,
-            position: 'top',
-          });
-        },
-      }
-    );
-
-  const { mutate: removeMenu }: { mutate: (id: number) => void } = useMutation(
-    'menus',
-    (id) =>
-      axios.delete(`http://localhost:8080/menu/${id}`, {
-        data: { userKey: '1234' },
-      }),
-    {
-      onSuccess: () => {
-        toast({
-          title: '메뉴 삭제 완료',
-          description: `메뉴 삭-제.`,
-          status: 'success',
-          duration: 5000,
-          isClosable: true,
-          position: 'top',
-        });
-        return queryClient.invalidateQueries('menus');
-      },
-      onError: (err: any) => {
-        toast({
-          title: '메뉴 삭제 실패',
-          description: `${err.response.data.message}`,
-          status: 'error',
-          duration: 5000,
-          isClosable: true,
-          position: 'top',
-        });
-      },
-    }
-  );
+  const { mutate: createCategory } = useCreateCategory();
+  const { mutate: removeCategory } = useDeleteCategory();
+  const { mutate: removeMenu } = useDeleteMenu();
 
   const menuNameRef = useRef<any>('');
   const menuCategoryNameRef = useRef<any>('');
@@ -162,43 +67,7 @@ const Admin = () => {
   const menuAmountRef = useRef<any>('');
   const menuVintageRef = useRef<any>('');
 
-  const { mutate: createMenu } = useMutation(
-    'menus',
-    () =>
-      axios.post('http://localhost:8080/menu', {
-        name: menuNameRef.current.value,
-        categoryname: menuCategoryNameRef.current.value,
-        type: menuTypeRef.current.value,
-        summary: menuSummaryRef.current.value,
-        alcohol: menuAlcoholRef.current.value,
-        amount: menuAmountRef.current.value,
-        vintage: menuVintageRef.current.value,
-      }),
-    {
-      onSuccess: (res) => {
-        const newData = res.data[res.data.length - 1].name;
-        toast({
-          title: '메뉴 생성 완료',
-          description: `'${newData}' 메뉴 생성이 완료되었습니다.`,
-          status: 'success',
-          duration: 5000,
-          isClosable: true,
-          position: 'top',
-        });
-        return queryClient.invalidateQueries('menus');
-      },
-      onError: (err: any) => {
-        toast({
-          title: '메뉴 추가 실패',
-          description: `${err.response.data.message}`,
-          status: 'error',
-          duration: 5000,
-          isClosable: true,
-          position: 'top',
-        });
-      },
-    }
-  );
+  const { mutate: createMenu } = useCreateMenu();
 
   if (!auth) {
     return (
@@ -326,7 +195,7 @@ const Admin = () => {
                               openSimpleDialog({
                                 title: '카테고리 삭제',
                                 content: `정말로 ${menu.name} 메뉴를 삭제하시겠습니까?`,
-                                handleConfirm: () => removeMenu(menu.id),
+                                handleConfirm: () => removeMenu(menu.id!),
                                 handleClose: () => {},
                               });
                             }}
@@ -348,7 +217,10 @@ const Admin = () => {
               <Button colorScheme='blue' mr={3} onClick={onClose}>
                 Close
               </Button>
-              <Button variant='ghost' onClick={() => createCategory()}>
+              <Button
+                variant='ghost'
+                onClick={() => createCategory(categoryNameRef.current.value)}
+              >
                 추가하기
               </Button>
             </ModalFooter>
@@ -426,7 +298,15 @@ const Admin = () => {
               <Button
                 variant='ghost'
                 onClick={() => {
-                  createMenu();
+                  createMenu({
+                    name: menuNameRef.current.value,
+                    categoryname: menuCategoryNameRef.current.value,
+                    type: menuTypeRef.current.value,
+                    summary: menuSummaryRef.current.value,
+                    alcohol: menuAlcoholRef.current.value,
+                    amount: menuAmountRef.current.value,
+                    vintage: menuVintageRef.current.value,
+                  });
                   onClose();
                 }}
               >

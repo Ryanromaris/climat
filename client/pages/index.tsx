@@ -8,24 +8,17 @@ import {
   AccordionPanel,
   Box,
 } from '@chakra-ui/react';
-import axios from 'axios';
-import { useRouter } from 'next/router';
-import { useState } from 'react';
 
-import { useQuery } from 'react-query';
+import { useRouter } from 'next/router';
+
 import CategoryItems from '../components/CategoryItems';
-import { CategoryType, MenuType } from '../types/type';
+import { useCategoryList, useMenuList } from '../queries/query';
 
 const Home = () => {
   const router = useRouter();
 
-  const categoryQuery = useQuery('categories', () =>
-    axios.get<CategoryType[]>('http://localhost:8080/category')
-  );
-
-  const menus = useQuery('menus', () =>
-    axios.get<MenuType[]>('http://localhost:8080/menu')
-  );
+  const categoryQuery = useCategoryList();
+  const menus = useMenuList();
 
   if (categoryQuery.isLoading || menus.isLoading) {
     return <div>Loading</div>;

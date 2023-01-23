@@ -6,12 +6,12 @@ export type CategoryType = {
 export type WineType = 'red' | 'white' | 'sparkling' | 'rose';
 
 export type MenuType = {
-  id: number;
-  name: string;
-  categoryname: string;
-  type: WineType;
-  summary: string;
-  alcohol: string;
-  vintage: string;
-  amount: string;
+  id?: number;
+  name?: string;
+  categoryname?: string;
+  type?: WineType;
+  summary?: string;
+  alcohol?: string;
+  vintage?: string;
+  amount?: string;
 };
