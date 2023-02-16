@@ -1,7 +1,3 @@
-[[redirects]]
-  from = "/menu"
-  to = "https://naver.com"
-  status = 200
-  force = false
-  query = {path = ":path"}
-  conditions = {Language = ["en"], Country = ["US"], Role = ["admin"]}
+[[redirects]];
+from = '/menu';
+to = 'https://naver.com';
