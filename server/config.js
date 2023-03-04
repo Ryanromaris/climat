@@ -17,4 +17,7 @@ export const config = {
     database: required('DB_DATABASE'),
     password: required('DB_PASSWORD'),
   },
+  cors: {
+    allowedOrigin: required('CORS_ALLOW_ORIGIN'),
+  },
 };
