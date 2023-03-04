@@ -23,8 +23,8 @@ export default function App({ Component, pageProps }: AppProps) {
             <Head>
               <meta
                 http-equiv='Content-Security-Policy'
-                content='upgrade-insecure-requests'
-              ></meta>
+                content='block-all-mixed-content'
+              />
             </Head>
             <Component {...pageProps} />
           </QueryClientProvider>
