@@ -1,0 +1,32 @@
+name: climat-client
+
+on:
+  push:
+    branches:
+      - develop    # sub-branch[branch name] 브랜치에서 push 이벤트가 일어났을 때 실행
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v2
+
+      - name: Cache node modules  # node modules 캐싱
+        uses: actions/setup-node@v1
+        with:
+          node-version: 16.x
+
+      - name: Build # project build
+        run: npm build
+        working-directory: client
+        
+      - name: configure credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          
+      - name: deploy to s3!
+        run: aws s3 sync ./${{ secrets.AWS_BUILD_DIRECTORY }} ${{ secrets.AWS_S3_BUCKET_NAME }} --acl public-read --delete
