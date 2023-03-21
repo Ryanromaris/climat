@@ -7,6 +7,10 @@ class MenuAPI {
     return axios.get<MenuType[]>(URLService.DefaultAPI('/menu'));
   }
 
+  getMenuById(id: number) {
+    return axios.get<MenuType>(URLService.DefaultAPI(`/menu/${id}`));
+  }
+
   createMenu({
     name,
     categoryname,

@@ -14,18 +14,16 @@ import {
 import axios from 'axios';
 import { useRouter } from 'next/router';
 import { useQuery } from 'react-query';
+import MenuAPI from '../../api/MenuAPI';
+import { useMenuById } from '../../queries/query';
 import { MenuType } from '../../types/type';
 
 const MenuDetail = () => {
   const router = useRouter();
   const { id } = router.query;
 
-  const { isLoading, isError, isSuccess, data, error } = useQuery(
-    'menus',
-    () => {
-      return axios.get<MenuType>(`http://localhost:8080/menu/${id}`);
-    },
-    { enabled: !!id }
+  const { isLoading, isError, isSuccess, data, error } = useMenuById(
+    Number(id)
   );
 
   if (isLoading) {

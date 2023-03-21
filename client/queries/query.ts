@@ -74,6 +74,12 @@ export const useMenuList = () => {
   return useQuery(queryKeys.menu, () => MenuAPI.getMenu());
 };
 
+export const useMenuById = (id: number) => {
+  return useQuery(queryKeys.menuById(id), () => MenuAPI.getMenuById(id), {
+    enabled: !!id,
+  });
+};
+
 export const useCreateMenu = () => {
   const queryClient = useQueryClient();
   const toast = useToast();
